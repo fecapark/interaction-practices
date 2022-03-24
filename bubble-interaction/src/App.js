@@ -43,22 +43,76 @@ class App {
   }
 
   resize() {
-    this.stageWidth = document.body.clientWidth;
-    this.stageHeight = document.body.clientHeight;
+    const getScaleRatio = () => {
+      const widthRatio = Math.min(this.stageWidth / minWidth, 1);
+      const heightRatio = Math.min(this.stageHeight / minHeight, 1);
 
-    this.$canvas.width = this.stageWidth * this.pixelRatio;
-    this.$canvas.height = this.stageHeight * this.pixelRatio;
+      this.scaleRatio = Math.min(widthRatio, heightRatio);
+
+      return [this.scaleRatio, widthRatio < heightRatio ? "width" : "height"];
+    };
+
+    const setStageSizeByScaledType = (scaleRatio, scaledType) => {
+      if (scaledType === "width") {
+        this.stageWidth = Math.max(this.stageWidth, minWidth) / this.pixelRatio;
+        this.stageHeight =
+          (this.stageHeight * (1 / scaleRatio)) / this.pixelRatio;
+      } else if (scaledType === "height") {
+        this.stageWidth =
+          (this.stageWidth * (1 / scaleRatio)) / this.pixelRatio;
+        this.stageHeight =
+          Math.max(this.stageHeight, minHeight) / this.pixelRatio;
+      } else {
+        throw Error(`Wrong scaled type: '${scaledType}'.`);
+      }
+
+      console.log(scaledType);
+    };
+
+    const setHTMLCanvasStyle = (scaleRatio) => {
+      this.$canvas.width = this.stageWidth;
+      this.$canvas.height = this.stageHeight;
+
+      // Set html canvas style
+      this.$canvas.style.width = `${this.$canvas.width}px`;
+      this.$canvas.style.height = `${this.$canvas.height}px`;
+      this.$canvas.style.transform = `scale(${scaleRatio})`;
+
+      const wrapper = document.querySelector(".navigation-wrapper");
+      wrapper.style.width = `${this.$canvas.width}px`;
+      wrapper.style.height = `${this.$canvas.height}px`;
+      wrapper.style.transform = `scale(${scaleRatio})`;
+    };
+
+    // For canvas resizing
+    this.stageWidth = document.body.clientWidth * this.pixelRatio;
+    this.stageHeight = document.body.clientHeight * this.pixelRatio;
 
     this.ctx.scale(this.pixelRatio, this.pixelRatio);
 
-    this.spinner.resize(this.stageWidth, this.stageHeight);
+    // For object resizing
+    const minWidth = 600 * this.pixelRatio;
+    const minHeight = 700 * this.pixelRatio;
+
+    const [scaleRatio, scaledType] = getScaleRatio();
+    setStageSizeByScaledType(scaleRatio, scaledType);
+    setHTMLCanvasStyle(scaleRatio);
+
+    // Real
+    this.spinner.resize(this.stageWidth, this.stageHeight); // end
+
     this.ballManager.resize(
       this.stageWidth,
       this.stageHeight,
       this.previousWidth,
       this.previousHeight
+    ); // end
+
+    this.guideManager.resize(
+      this.stageWidth,
+      this.stageHeight,
+      this.scaleRatio
     );
-    this.guideManager.resize();
 
     this.previousWidth = this.stageWidth;
     this.previousHeight = this.stageHeight;
@@ -116,8 +170,8 @@ class App {
     const transitionInterval = 100;
     const masks = document.querySelectorAll(".mask");
     for (let i = 0; i < masks.length; i++) {
-      (function(x) {
-        setTimeout(function() {
+      (function (x) {
+        setTimeout(function () {
           masks[i].classList.add("animate");
         }, x * transitionInterval);
       })(i);
@@ -126,10 +180,9 @@ class App {
     setTimeout(() => {
       this.$canvas.classList.add("animate");
     }, transitionInterval * masks.length);
-    this.$canvas.addEventListener("transitionend", () => {
-      this.startSpinner = true;
-      document.querySelector(".logo").style.display = "block";
-    });
+    this.startSpinner = true;
+    document.querySelector(".logo").style.display = "block";
+    this.$canvas.addEventListener("transitionend", () => {});
   }
 
   getModules() {
@@ -137,7 +190,7 @@ class App {
       spinner: this.spinner,
       ballManager: this.ballManager,
       pointerManager: this.pointerManager,
-      guideManager: this.guideManager
+      guideManager: this.guideManager,
     };
   }
 }

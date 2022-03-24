@@ -29,14 +29,14 @@ class BallManager {
     // fontSize가 14로 고정되어 있음.
     // 동적으로 받아올 수 있는 방법이 있을까?
 
-    const pickAreas = areas => {
+    const pickAreas = (areas) => {
       const pick = Math.floor(Math.random() * 2);
 
       if (pick === 0) return [areas[0], areas[3]];
       return [areas[1], areas[2]];
     };
 
-    const getGuideOuterRadius = maxRadius => {
+    const getGuideOuterRadius = (maxRadius) => {
       const margin = fontSize * 0.5;
       const guideRaidus = maxRadius * guideRadiusScale;
       return Math.max(guideRaidus, margin + metrics.width / 2);
@@ -67,7 +67,7 @@ class BallManager {
       new Vector2(0, 0), // top-left area
       new Vector2(this.stageWidth / 2, 0), // top-right area
       new Vector2(0, this.stageHeight / 2), // bottom-left area
-      new Vector2(this.stageWidth / 2, this.stageHeight / 2) // bottom-right area
+      new Vector2(this.stageWidth / 2, this.stageHeight / 2), // bottom-right area
     ];
     const pickedAreas = pickAreas(areas);
 
@@ -76,7 +76,7 @@ class BallManager {
     for (let i = 0; i < this.initBallNum; i++) {
       this.firstBallInfos.push({
         pos: null,
-        maxRadius: this.getNewBallMaxRadius()
+        maxRadius: this.getNewBallMaxRadius(),
       });
     }
 

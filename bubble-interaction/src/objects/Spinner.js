@@ -59,6 +59,8 @@ class Spinner {
       this.rotate += this.rspeed * (this.rotateClockWise ? 1 : -1);
     }
     this.rotate %= 2 * Math.PI;
+
+    // console.log(this.rspeed);
   }
 
   setRotated() {
@@ -137,26 +139,28 @@ class Spinner {
     this.stageHeight = stageHeight;
 
     // Resize
-    this.maxWidth = Math.max(Math.min(stageWidth / 2.5, 400), 200);
+    this.maxWidth = 400;
+
+    // this.maxWidth = Math.max(Math.min(stageWidth / 2.5, 400), 200);
     this.balanceSize();
-    this.previousMaxWidth = this.maxWidth;
+    // this.previousMaxWidth = this.maxWidth;
 
     // Reposition
     this.rePosition();
   }
 
   rePosition() {
-    this.pos.x = this.stageWidth / 2;
-    this.pos.y = this.stageHeight / 2;
+    this.pos.x = this.app.stageWidth / 2;
+    this.pos.y = this.app.stageHeight / 2;
     this.topLeft.x = this.pos.x - this.width / 2;
     this.topLeft.y = this.pos.y - this.height / 2;
   }
 
   balanceSize() {
-    this.width *=
-      this.maxWidth /
-      (this.previousMaxWidth ? this.previousMaxWidth : this.maxWidth);
-    this.height = this.width * this.heightRatio;
+    // this.width *=
+    //   this.maxWidth /
+    //   (this.previousMaxWidth ? this.previousMaxWidth : this.maxWidth);
+    // this.height = this.width * this.heightRatio;
 
     this.interactionAreaRadius = Math.sqrt(
       Math.pow(this.maxWidth / 2, 2) +

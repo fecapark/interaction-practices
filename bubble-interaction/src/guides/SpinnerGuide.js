@@ -32,7 +32,8 @@ class SpinnerGuide extends Guide {
     this.manageSpinnerSpin();
   }
 
-  resize(stageWidth, stageHeight) {
+  resize(stageWidth, stageHeight, scaleRatio) {
+    console.log("sdsd");
     super.resize(stageWidth, stageHeight);
 
     const spinner = this.app.getModules().spinner;

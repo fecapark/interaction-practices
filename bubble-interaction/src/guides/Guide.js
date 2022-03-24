@@ -19,8 +19,6 @@ class Guide {
     this.guideInfos = [];
 
     // Sizes
-    this.previousWidth = this.app.stageWidth;
-    this.previousHeight = this.app.stageHeight;
     this.pixelRatio = this.app.pixelRatio;
 
     // Parameters
@@ -49,7 +47,7 @@ class Guide {
       this.ctx.fillRect(0, 0, this.app.stageWidth, this.app.stageHeight);
     };
 
-    const drawGuideArea = aGuideInfo => {
+    const drawGuideArea = (aGuideInfo) => {
       this.ctx.beginPath();
       this.ctx.globalCompositeOperation = "destination-out";
       this.ctx.fillStyle = "rgba(255, 255, 255, 1)";
@@ -63,7 +61,7 @@ class Guide {
       this.ctx.fill();
     };
 
-    const drawGuideText = aGuideInfo => {
+    const drawGuideText = (aGuideInfo) => {
       this.ctx.beginPath();
       this.ctx.globalCompositeOperation = "source-over";
       this.ctx.font = `bold ${this.fontSize}px Roboto`;
@@ -114,19 +112,16 @@ class Guide {
 
     this.ctx.scale(this.pixelRatio, this.pixelRatio);
 
-    this.resizeFont();
-
-    this.previousWidth = this.stageWidth;
-    this.previousHeight = this.stageHeight;
+    this.fontSize = 14;
   }
 
   resizeFont() {
-    const maxFontSize = 14;
-    const minFontSize = 12;
-    this.fontSize = Math.min(
-      Math.max(this.stageWidth * 0.01, minFontSize),
-      maxFontSize
-    );
+    // const maxFontSize = 14;
+    // const minFontSize = 12;
+    // this.fontSize = Math.min(
+    //   Math.max(this.stageWidth * 0.01, minFontSize),
+    //   maxFontSize
+    // );
   }
 
   fadeInGuide(callBack = null) {

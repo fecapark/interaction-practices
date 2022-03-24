@@ -16,18 +16,15 @@ class GuideManager {
 
     // Parameters
     this.guideInterval = 1;
-
-    // About resize
-    this.resize();
   }
 
   setGuide() {
     this.currentGuideIndex = 0;
     this.guides = [
       new SpinnerGuide(this.$canvas, this.ctx, this.app),
-      new BallGuide(this.$canvas, this.ctx, this.app)
+      new BallGuide(this.$canvas, this.ctx, this.app),
     ];
-    this.resize();
+    this.resize(this.app.stageWidth, this.app.stageHeight, this.app.scaleRatio);
   }
 
   startNextGuide(jump = 1) {
@@ -49,14 +46,19 @@ class GuideManager {
     this.getCurrentGuide().update();
   }
 
-  resize() {
+  resize(stageWidth, stageHeight, scaleRatio) {
+    this.$canvas.width = stageWidth;
+    this.$canvas.height = stageHeight;
+
+    // Set html canvas style
+    this.$canvas.style.width = `${this.$canvas.width}px`;
+    this.$canvas.style.height = `${this.$canvas.height}px`;
+    this.$canvas.style.transform = `scale(${scaleRatio})`;
+
     if (this.isGuideNotStart()) return;
 
-    const stageWidth = document.body.clientWidth;
-    const stageHeight = document.body.clientHeight;
-
     for (const guide of this.guides) {
-      guide.resize(stageWidth, stageHeight);
+      guide.resize(stageWidth, stageHeight, scaleRatio);
     }
   }
 

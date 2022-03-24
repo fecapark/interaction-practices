@@ -26,6 +26,9 @@ class PointerManager {
 
   isDowninSpinnerArea(x, y) {
     const spinner = this.app.getModules().spinner;
+
+    console.log();
+
     return spinner.pos.dist(new Vector2(x, y)) <= spinner.interactionAreaRadius;
   }
 
@@ -33,17 +36,23 @@ class PointerManager {
     if (this.preventEvent) return;
     if (!this.app.startInteraction) return;
 
-    if (this.isDowninSpinnerArea(e.clientX, e.clientY)) {
+    const offsetPos = new Vector2(e.clientX, e.clientY).mul(
+      1 / this.app.scaleRatio
+    );
+
+    if (this.isDowninSpinnerArea(offsetPos.x, offsetPos.y)) {
       this.isSpinnerDown = true;
-      this.offsetPos = new Vector2(e.clientX, e.clientY);
+      this.offsetPos = offsetPos;
     } else {
       this.isBackgroundDown = true;
     }
   }
 
   onPointerMove(e) {
-    const isClockWise = rotateCenter => {
-      const pointerPos = new Vector2(e.clientX, e.clientY).sub(rotateCenter);
+    const isClockWise = (rotateCenter) => {
+      const pointerPos = new Vector2(e.clientX, e.clientY)
+        .mul(1 / this.app.scaleRatio)
+        .sub(rotateCenter);
       const crossValue = pointerPos.cross(this.offsetPos.sub(rotateCenter));
       const theta = Math.asin(
         crossValue / (pointerPos.norm() * this.offsetPos.norm())
@@ -54,8 +63,17 @@ class PointerManager {
 
     if (this.isSpinnerDown) {
       const spinner = this.app.getModules().spinner;
-      const movePos = new Vector2(e.clientX, e.clientY).sub(this.offsetPos);
-      const rotateSpeed = Math.max(Math.min(movePos.norm() * 0.01, 0.07), 0.01);
+      const movePos = new Vector2(e.clientX, e.clientY)
+        .mul(1 / this.app.scaleRatio)
+        .sub(this.offsetPos);
+      const rotateSpeed = Math.max(
+        Math.min(movePos.mul(this.app.scaleRatio).norm() * 0.01, 0.05),
+        0.01
+      );
+
+      console.log(
+        `${movePos.mul(this.app.scaleRatio).norm()} vs ${movePos.norm()}`
+      );
 
       if (isClockWise(spinner.pos)) {
         spinner.rotate += rotateSpeed;
@@ -65,7 +83,9 @@ class PointerManager {
         spinner.rotateClockWise = false;
       }
 
-      this.offsetPos = new Vector2(e.clientX, e.clientY);
+      this.offsetPos = new Vector2(e.clientX, e.clientY).mul(
+        1 / this.app.scaleRatio
+      );
     }
   }
 
@@ -89,7 +109,10 @@ class PointerManager {
     if (!this.app.startInteraction) return;
 
     if (this.isBackgroundDown) {
-      this.app.getModules().ballManager.createNewBall(e.clientX, e.clientY);
+      const offsetPos = new Vector2(e.clientX, e.clientY).mul(
+        1 / this.app.scaleRatio
+      );
+      this.app.getModules().ballManager.createNewBall(offsetPos.x, offsetPos.y);
     }
 
     this.isSpinnerDown = false;

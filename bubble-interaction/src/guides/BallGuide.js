@@ -37,7 +37,7 @@ class BallGuide extends Guide {
     }
   }
 
-  resize(stageWidth, stageHeight) {
+  resize(stageWidth, stageHeight, scaleRatio) {
     super.resize(stageWidth, stageHeight);
 
     for (const ballGuide of this.ballGuides) {

@@ -41,6 +41,7 @@ class Ball {
     this.stageHeight = stageHeight;
     this.pos.x *= stageWidth / previousWidth;
     this.pos.y *= stageHeight / previousHeight;
+    // this.speed *= 1 / this.app.scaleRatio;
   }
 
   update(stopMovement) {
@@ -137,7 +138,7 @@ class Ball {
   getRadiusAnimator(startRadius, startOpacity, duration, shrink = false) {
     const beziers = {
       growth: [0.3, 2, 0.65, 1],
-      shrink: [0.6, -0.28, 0.73, 0.05]
+      shrink: [0.6, -0.28, 0.73, 0.05],
     };
 
     let startTime = null;
@@ -173,7 +174,7 @@ class Ball {
       [1, 1],
       [-1, 1],
       [1, -1],
-      [-1, -1]
+      [-1, -1],
     ];
     const randIdx = Math.floor(Math.random() * 4);
 
@@ -203,13 +204,13 @@ class Ball {
   bounceOnFrame() {
     if (
       this.pos.x <= this.radius ||
-      this.pos.x >= this.stageWidth - this.radius
+      this.pos.x >= this.app.stageWidth - this.radius
     ) {
       this.dir.x *= -1;
       this.pos.x += this.dir.x * this.speed;
     } else if (
       this.pos.y <= this.radius ||
-      this.pos.y >= this.stageHeight - this.radius
+      this.pos.y >= this.app.stageHeight - this.radius
     ) {
       this.dir.y *= -1;
       this.pos.y += this.dir.y * this.speed;
