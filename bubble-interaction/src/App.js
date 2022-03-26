@@ -138,16 +138,12 @@ class App {
     const widthRatio = Math.min(this.stageWidth / resizeMinWidth, 1);
     const heightRatio = Math.min(this.stageHeight / resizeMinHeight, 1);
 
-    console.log(`widthRatio: ${widthRatio}`);
-    console.log(`heightRatio: ${heightRatio}`);
-
     this.scaleRatio = Math.min(widthRatio, heightRatio);
 
     return [this.scaleRatio, widthRatio < heightRatio ? "width" : "height"];
   }
 
   setStageSizeByScaledType(scaledType, resizeMinWidth, resizeMinHeight) {
-    console.log(scaledType);
     if (scaledType === "width") {
       // 아래가 빔
       this.stageWidth = Math.max(this.stageWidth, resizeMinWidth);

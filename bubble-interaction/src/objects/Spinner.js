@@ -5,11 +5,10 @@ class Spinner {
     this.app = app;
 
     // Sizes
+    this.maxWidth = 400;
     this.width = 0;
     this.height = 0;
     this.heightRatio = 0.15;
-    this.stageWidth = 0;
-    this.stageHeight = 0;
     this.interactionAreaRadius = 0;
 
     // Positions
@@ -30,10 +29,10 @@ class Spinner {
   }
 
   update() {
-    this.rePosition();
     this.spin();
 
     if (!this.appears) {
+      this.rePosition(this.app.stageWidth, this.app.stageHeight);
       this.appearAnimation();
     }
   }
@@ -91,6 +90,7 @@ class Spinner {
   }
 
   drawSpinner() {
+    console.log(this.pos.x);
     this.ctx.fillStyle = "white";
     this.ctx.fillRect(this.topLeft.x, this.topLeft.y, this.width, this.height);
   }
@@ -135,33 +135,18 @@ class Spinner {
   }
 
   resize(stageWidth, stageHeight) {
-    this.stageWidth = stageWidth;
-    this.stageHeight = stageHeight;
-
-    // Resize
-    this.maxWidth = 400;
-
-    // this.maxWidth = Math.max(Math.min(stageWidth / 2.5, 400), 200);
-    this.balanceSize();
-    // this.previousMaxWidth = this.maxWidth;
-
-    // Reposition
-    this.rePosition();
+    this.balanceInteractionAreaSize();
+    this.rePosition(stageWidth, stageHeight);
   }
 
-  rePosition() {
-    this.pos.x = this.stageWidth / 2;
-    this.pos.y = this.stageHeight / 2;
+  rePosition(stageWidth, stageHeight) {
+    this.pos.x = stageWidth / 2;
+    this.pos.y = stageHeight / 2;
     this.topLeft.x = this.pos.x - this.width / 2;
     this.topLeft.y = this.pos.y - this.height / 2;
   }
 
-  balanceSize() {
-    // this.width *=
-    //   this.maxWidth /
-    //   (this.previousMaxWidth ? this.previousMaxWidth : this.maxWidth);
-    // this.height = this.width * this.heightRatio;
-
+  balanceInteractionAreaSize() {
     this.interactionAreaRadius = Math.sqrt(
       Math.pow(this.maxWidth / 2, 2) +
         Math.pow((this.maxWidth * this.heightRatio) / 2, 2)
