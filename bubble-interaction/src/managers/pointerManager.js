@@ -26,21 +26,19 @@ class PointerManager {
 
   isDowninSpinnerArea(x, y) {
     const spinner = this.app.getModules().spinner;
-
-    console.log();
-
     return spinner.pos.dist(new Vector2(x, y)) <= spinner.interactionAreaRadius;
   }
 
   onPointerDown(e) {
+    this.time = new Date();
+
     if (this.preventEvent) return;
     if (!this.app.startInteraction) return;
 
-    const offsetPos = new Vector2(e.clientX, e.clientY).mul(
-      1 / this.app.scaleRatio
-    );
+    const offsetPos = new Vector2(e.clientX, e.clientY);
+    const scaledOffsetPos = offsetPos.div(this.app.scaleRatio);
 
-    if (this.isDowninSpinnerArea(offsetPos.x, offsetPos.y)) {
+    if (this.isDowninSpinnerArea(scaledOffsetPos.x, scaledOffsetPos.y)) {
       this.isSpinnerDown = true;
       this.offsetPos = offsetPos;
     } else {
@@ -49,13 +47,20 @@ class PointerManager {
   }
 
   onPointerMove(e) {
+    console.log(new Date() - this.time);
+    this.time = new Date();
+
     const isClockWise = (rotateCenter) => {
-      const pointerPos = new Vector2(e.clientX, e.clientY)
-        .mul(1 / this.app.scaleRatio)
+      const scaleRatio = this.app.scaleRatio;
+      const scaledPointerPos = new Vector2(e.clientX, e.clientY)
+        .div(scaleRatio)
         .sub(rotateCenter);
-      const crossValue = pointerPos.cross(this.offsetPos.sub(rotateCenter));
+      const crossValue = scaledPointerPos.cross(
+        this.offsetPos.div(scaleRatio).sub(rotateCenter)
+      );
       const theta = Math.asin(
-        crossValue / (pointerPos.norm() * this.offsetPos.norm())
+        crossValue /
+          (scaledPointerPos.norm() * this.offsetPos.div(scaleRatio).norm())
       );
 
       return theta < 0;
@@ -63,17 +68,13 @@ class PointerManager {
 
     if (this.isSpinnerDown) {
       const spinner = this.app.getModules().spinner;
-      const movePos = new Vector2(e.clientX, e.clientY)
-        .mul(1 / this.app.scaleRatio)
-        .sub(this.offsetPos);
+      const movePos = new Vector2(e.clientX, e.clientY).sub(
+        this.offsetPos.mul(this.app.scaleRatio)
+      );
       const rotateSpeed = Math.max(
-        Math.min(movePos.mul(this.app.scaleRatio).norm() * 0.01, 0.05),
+        Math.min(movePos.norm() * 0.01, spinner.maxRspeed),
         0.01
       );
-
-      // console.log(
-      //   `${movePos.mul(this.app.scaleRatio).norm()} vs ${movePos.norm()}`
-      // );
 
       if (isClockWise(spinner.pos)) {
         spinner.rotate += rotateSpeed;
@@ -83,9 +84,7 @@ class PointerManager {
         spinner.rotateClockWise = false;
       }
 
-      this.offsetPos = new Vector2(e.clientX, e.clientY).mul(
-        1 / this.app.scaleRatio
-      );
+      this.offsetPos = new Vector2(e.clientX, e.clientY);
     }
   }
 
@@ -109,10 +108,12 @@ class PointerManager {
     if (!this.app.startInteraction) return;
 
     if (this.isBackgroundDown) {
-      const offsetPos = new Vector2(e.clientX, e.clientY).mul(
-        1 / this.app.scaleRatio
+      const scaledOffsetPos = new Vector2(e.clientX, e.clientY).div(
+        this.app.scaleRatio
       );
-      this.app.getModules().ballManager.createNewBall(offsetPos.x, offsetPos.y);
+      this.app
+        .getModules()
+        .ballManager.createNewBall(scaledOffsetPos.x, scaledOffsetPos.y);
     }
 
     this.isSpinnerDown = false;

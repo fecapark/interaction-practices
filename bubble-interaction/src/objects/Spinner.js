@@ -58,8 +58,6 @@ class Spinner {
       this.rotate += this.rspeed * (this.rotateClockWise ? 1 : -1);
     }
     this.rotate %= 2 * Math.PI;
-
-    // console.log(this.rspeed);
   }
 
   setRotated() {
@@ -90,7 +88,6 @@ class Spinner {
   }
 
   drawSpinner() {
-    console.log(this.pos.x);
     this.ctx.fillStyle = "white";
     this.ctx.fillRect(this.topLeft.x, this.topLeft.y, this.width, this.height);
   }
