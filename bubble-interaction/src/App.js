@@ -14,11 +14,16 @@ import GuideManager from "./managers/GuideManager.js";
 class App {
   constructor($target) {
     this.$canvas = $target;
+
     this.ctx = this.$canvas.getContext("2d");
 
     // States
     this.startSpinner = false;
     this.startInteraction = false;
+
+    // Sizes
+    this.stageWidth = 0;
+    this.stageHeight = 0;
     this.previousWidth = document.body.clientWidth;
     this.previousHeight = document.body.clientHeight;
 
@@ -27,7 +32,10 @@ class App {
     this.ballManager = new BallManager(this.ctx, this);
 
     // Manage guides
-    this.guideManager = new GuideManager(this);
+    this.guideManager = new GuideManager(
+      this,
+      document.getElementById("guide-canvas")
+    );
 
     // About resize
     this.pixelRatio = window.devicePixelRatio > 1 ? 2 : 1;
@@ -43,47 +51,6 @@ class App {
   }
 
   resize() {
-    const getScaleRatio = () => {
-      const widthRatio = Math.min(this.stageWidth / minWidth, 1);
-      const heightRatio = Math.min(this.stageHeight / minHeight, 1);
-
-      this.scaleRatio = Math.min(widthRatio, heightRatio);
-
-      return [this.scaleRatio, widthRatio < heightRatio ? "width" : "height"];
-    };
-
-    const setStageSizeByScaledType = (scaleRatio, scaledType) => {
-      if (scaledType === "width") {
-        this.stageWidth = Math.max(this.stageWidth, minWidth) / this.pixelRatio;
-        this.stageHeight =
-          (this.stageHeight * (1 / scaleRatio)) / this.pixelRatio;
-      } else if (scaledType === "height") {
-        this.stageWidth =
-          (this.stageWidth * (1 / scaleRatio)) / this.pixelRatio;
-        this.stageHeight =
-          Math.max(this.stageHeight, minHeight) / this.pixelRatio;
-      } else {
-        throw Error(`Wrong scaled type: '${scaledType}'.`);
-      }
-
-      console.log(scaledType);
-    };
-
-    const setHTMLCanvasStyle = (scaleRatio) => {
-      this.$canvas.width = this.stageWidth;
-      this.$canvas.height = this.stageHeight;
-
-      // Set html canvas style
-      this.$canvas.style.width = `${this.$canvas.width}px`;
-      this.$canvas.style.height = `${this.$canvas.height}px`;
-      this.$canvas.style.transform = `scale(${scaleRatio})`;
-
-      const wrapper = document.querySelector(".navigation-wrapper");
-      wrapper.style.width = `${this.$canvas.width}px`;
-      wrapper.style.height = `${this.$canvas.height}px`;
-      wrapper.style.transform = `scale(${scaleRatio})`;
-    };
-
     // For canvas resizing
     this.stageWidth = document.body.clientWidth * this.pixelRatio;
     this.stageHeight = document.body.clientHeight * this.pixelRatio;
@@ -91,22 +58,25 @@ class App {
     this.ctx.scale(this.pixelRatio, this.pixelRatio);
 
     // For object resizing
-    const minWidth = 600 * this.pixelRatio;
-    const minHeight = 700 * this.pixelRatio;
 
-    const [scaleRatio, scaledType] = getScaleRatio();
-    setStageSizeByScaledType(scaleRatio, scaledType);
-    setHTMLCanvasStyle(scaleRatio);
+    const resizeMinWidth = 650 * this.pixelRatio;
+    const resizeMinHeight = 650 * this.pixelRatio;
 
-    // Real
-    this.spinner.resize(this.stageWidth, this.stageHeight); // end
+    const [scaleRatio, scaledType] = this.getScaleRatio(
+      resizeMinWidth,
+      resizeMinHeight
+    );
+    this.setStageSizeByScaledType(scaledType, resizeMinWidth, resizeMinHeight);
+    this.setHTMLCanvasStyle(scaleRatio);
+
+    this.spinner.resize(this.stageWidth, this.stageHeight);
 
     this.ballManager.resize(
       this.stageWidth,
       this.stageHeight,
       this.previousWidth,
       this.previousHeight
-    ); // end
+    );
 
     this.guideManager.resize(
       this.stageWidth,
@@ -162,6 +132,47 @@ class App {
     animateBalls();
 
     requestAnimationFrame(this.animate.bind(this));
+  }
+
+  getScaleRatio(resizeMinWidth, resizeMinHeight) {
+    const widthRatio = Math.min(this.stageWidth / resizeMinWidth, 1);
+    const heightRatio = Math.min(this.stageHeight / resizeMinHeight, 1);
+
+    console.log(`widthRatio: ${widthRatio}`);
+    console.log(`heightRatio: ${heightRatio}`);
+
+    this.scaleRatio = Math.min(widthRatio, heightRatio);
+
+    return [this.scaleRatio, widthRatio < heightRatio ? "width" : "height"];
+  }
+
+  setStageSizeByScaledType(scaledType, resizeMinWidth, resizeMinHeight) {
+    console.log(scaledType);
+    if (scaledType === "width") {
+      // 아래가 빔
+      this.stageWidth = Math.max(this.stageWidth, resizeMinWidth);
+      this.stageHeight = Math.max(
+        this.stageHeight / this.scaleRatio,
+        resizeMinHeight
+      );
+    } else if (scaledType === "height") {
+      this.stageWidth = Math.max(
+        this.stageWidth / this.scaleRatio,
+        resizeMinWidth
+      );
+      this.stageHeight = Math.max(this.stageHeight, resizeMinHeight);
+    }
+  }
+
+  setHTMLCanvasStyle(scaleRatio) {
+    this.$canvas.width = this.stageWidth;
+    this.$canvas.height = this.stageHeight;
+
+    // Set html canvas style
+    const wrapper = document.querySelector(".main-scale-wrapper");
+    wrapper.style.width = `${this.$canvas.width}px`;
+    wrapper.style.height = `${this.$canvas.height}px`;
+    wrapper.style.transform = `scale(${scaleRatio})`;
   }
 
   initTransitions() {

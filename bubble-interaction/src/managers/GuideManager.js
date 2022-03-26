@@ -2,13 +2,12 @@ import SpinnerGuide from "../guides/SpinnerGuide.js";
 import BallGuide from "../guides/BallGuide.js";
 
 class GuideManager {
-  constructor(app) {
+  constructor(app, $guideCanvas) {
     this.app = app;
 
     // About guide canvas
-    this.$canvas = null;
-    this.ctx = null;
-    this.createGuideCanvas();
+    this.$canvas = $guideCanvas;
+    this.ctx = $guideCanvas.getContext("2d");
 
     // Guides
     this.currentGuideIndex = -1;
@@ -50,24 +49,11 @@ class GuideManager {
     this.$canvas.width = stageWidth;
     this.$canvas.height = stageHeight;
 
-    // Set html canvas style
-    this.$canvas.style.width = `${this.$canvas.width}px`;
-    this.$canvas.style.height = `${this.$canvas.height}px`;
-    this.$canvas.style.transform = `scale(${scaleRatio})`;
-
     if (this.isGuideNotStart()) return;
 
     for (const guide of this.guides) {
       guide.resize(stageWidth, stageHeight, scaleRatio);
     }
-  }
-
-  createGuideCanvas() {
-    this.$canvas = document.createElement("canvas");
-    this.ctx = this.$canvas.getContext("2d");
-    this.$canvas.id = "guide-canvas";
-
-    document.body.appendChild(this.$canvas);
   }
 
   isGuideNotStart() {

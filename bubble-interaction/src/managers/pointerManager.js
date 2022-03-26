@@ -71,9 +71,9 @@ class PointerManager {
         0.01
       );
 
-      console.log(
-        `${movePos.mul(this.app.scaleRatio).norm()} vs ${movePos.norm()}`
-      );
+      // console.log(
+      //   `${movePos.mul(this.app.scaleRatio).norm()} vs ${movePos.norm()}`
+      // );
 
       if (isClockWise(spinner.pos)) {
         spinner.rotate += rotateSpeed;

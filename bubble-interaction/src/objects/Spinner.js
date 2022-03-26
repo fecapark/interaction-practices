@@ -150,8 +150,8 @@ class Spinner {
   }
 
   rePosition() {
-    this.pos.x = this.app.stageWidth / 2;
-    this.pos.y = this.app.stageHeight / 2;
+    this.pos.x = this.stageWidth / 2;
+    this.pos.y = this.stageHeight / 2;
     this.topLeft.x = this.pos.x - this.width / 2;
     this.topLeft.y = this.pos.y - this.height / 2;
   }
